@@ -72,14 +72,6 @@ int length(Queue* s) {
 	return count;
 }
 
-void reverse(Queue*& s) {
-	if (!isEmpty(s)) {
-		int v = dequeue(s);
-		reverse(s);
-		enqueue(s, v);
-	}
-}
-
 void deleteQueue(Queue*& s) {
 	while (!isEmpty(s)) {
 		dequeue(s);
@@ -103,108 +95,83 @@ void printQueue(Queue* s, const char* message = "Queue: ") {
 
 // Inserire qui sotto la dichiarazione della funzione calcola
 
-void calcola(Queue*& q1, Queue*& q2);
+Queue* calcola(Queue*& q);
 
 // Inserire qui sopra la dichiarazione della funzione calcola
 
 int main() {
-	Queue *q1, *q2;
+	Queue *s, *result;
 	unsigned int seed = (unsigned int)time(NULL);
 	// seed = 60000
 	seed = 1697033220;
 	srand(seed);
 
-	q1 = initQueue();
-	q2 = initQueue();
-	for (int i = 0; i < 10; i++) {
-		if (i % 2 == 0)
-			enqueue(q1, 10 - i);
-		else
-			enqueue(q2, 10 - i);
+	s = initQueue();
+	for (int i = 0; i < 5; i++) {
+		if (i != 2)
+			enqueue(s, 5 - i);
 	}
-	printQueue(q1, "Q1: ");
-	printQueue(q2, "Q2: ");
-	calcola(q1, q2);
-	printQueue(q1, "NQ1: ");
-	printQueue(q2, "NQ2: ");
-	deleteQueue(q1);
-	deleteQueue(q2);
+	printQueue(s, "Original before: ");
+	result = calcola(s);
+	printQueue(result, "Result of calcola: ");
+	printQueue(s, "Original after: ");
+	deleteQueue(s);
+	deleteQueue(result);
 
-	q1 = initQueue();
-	q2 = initQueue();
+	s = initQueue();
 	for (int i = 0; i < 10; i++) {
-		enqueue(q1, rand() % 10);
-		enqueue(q2, rand() % 10);
+		enqueue(s, rand() % 10);
 	}
-	printQueue(q1, "Q1: ");
-	printQueue(q2, "Q2: ");
-	calcola(q1, q2);
-	printQueue(q1, "NQ1: ");
-	printQueue(q2, "NQ2: ");
-	deleteQueue(q1);
-	deleteQueue(q2);
+	enqueue(s, 7);
+	printQueue(s, "Original before: ");
+	result = calcola(s);
+	printQueue(result, "Result of calcola: ");
+	printQueue(s, "Original after: ");
+	deleteQueue(s);
+	deleteQueue(result);
 
-	q1 = initQueue();
-	q2 = initQueue();
-	printQueue(q1, "Q1: ");
-	printQueue(q2, "Q2: ");
-	calcola(q1, q2);
-	printQueue(q1, "NQ1: ");
-	printQueue(q2, "NQ2: ");
-	deleteQueue(q1);
-	deleteQueue(q2);
+	s = initQueue();
+	result = calcola(s);
+	printQueue(result, "Result of calcola: ");
+	printQueue(s, "Original after: ");
+	deleteQueue(s);
+	deleteQueue(result);
 
 	return 0;
 }
 
-// Inserire qui sotto la definizione della funzione calcola
-
-// First approach: without queue implementation details:
-void calcolaHelper(Queue*& q1, Queue*& q2, int accData1, int accData2) {
-	dequeue(q1);
-	dequeue(q2);
-
-	if (!isEmpty(q1)) {
-		calcolaHelper(q1, q2, first(q1), first(q2));
+void reverse(Queue*& s) {
+	if (!isEmpty(s)) {
+		int v = dequeue(s);
+		reverse(s);
+		enqueue(s, v);
 	}
-
-	enqueue(q1, accData1 + accData2);
-	enqueue(q2, accData2);
 }
 
-void calcola(Queue*& q1, Queue*& q2) {
+void calcolaHelper(Queue*& q1, Queue*& q2, int counts[]) {
 	if (isEmpty(q1))
 		return;
 
-	reverse(q1);
+	int data = dequeue(q1);
 
-	calcolaHelper(q1, q2, first(q1), first(q2));
+	counts[data]++;
 
-	reverse(q2);
+	enqueue(q2, data);
+	enqueue(q2, counts[data]);
+
+	calcolaHelper(q1, q2, counts);
+
+	enqueue(q1, data);
 }
 
-// Second approach: with queue implementation details:
-List* traverse(List* head, int index) {
-	if (index == 0)
-		return head;
+Queue* calcola(Queue*& q) {
+	Queue* newQueue = initQueue();
 
-	return traverse(head->next, index - 1);
+	int counts[10] = {0};
+
+	calcolaHelper(q, newQueue, counts);
+
+	reverse(q);
+
+	return newQueue;
 }
-
-void calcolaHelper2(Queue* q1, Queue* q2, int length, int acc) {
-	if (length == 0)
-		return;
-
-	List* q1Node = traverse(q1->head, acc);
-	List* q2Node = traverse(q2->head, length - 1);
-
-	q1Node->data += q2Node->data;
-
-	calcolaHelper2(q1, q2, length - 1, acc + 1);
-}
-
-void calcola2(Queue* q1, Queue* q2) {
-	calcolaHelper2(q1, q2, length(q1), 0);
-}
-
-// Inserire qui sopra la definizione della funzione calcola
