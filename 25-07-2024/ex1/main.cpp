@@ -39,7 +39,7 @@ int main(int argc, char* argv[]) {
 	char* pwords[MAX_CHARACTERS]{nullptr};
 
 	int numWords{0};
-	char currChar, prevChar = ' ';
+	char currChar{' '}, prevChar{' '};
 
 	for (int i{0}; i < MAX_CHARACTERS && inputFile.get(currChar) && !inputFile.eof();
 		 i++) {
