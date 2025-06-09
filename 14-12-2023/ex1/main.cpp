@@ -58,5 +58,8 @@ int main(int argc, char* argv[]) {
 		outputFile << word << endl;
 	}
 
+	inputFile.close();
+	outputFile.close();
+
 	return 0;
 }
